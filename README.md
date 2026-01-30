@@ -15,22 +15,32 @@
 
 ## 🎯 Tổng quan nhóm tính năng
 
-### Bảng phân bổ nhóm tính năng (Ví dụ: 3 thành viên = 12 nhóm tính năng)
+### Bảng phân bổ nhóm tính năng (5 thành viên = 20 nhóm tính năng)
 
-| STT | Nhóm tính năng | Số tính năng con | Độ ưu tiên |
-|-----|----------------|------------------|------------|
-| 1 | Xác thực & Bảo mật | 6 | Cao |
-| 2 | Quản lý hồ sơ người dùng | 5 | Cao |
-| 3 | Duyệt & Tìm kiếm sản phẩm | 6 | Cao |
-| 4 | Chi tiết sản phẩm | 5 | Cao |
-| 5 | Đấu giá (Bidding) | 6 | Cao |
-| 6 | Quản lý sản phẩm (Seller) | 5 | Cao |
-| 7 | Hệ thống thông báo | 4 | Trung bình |
-| 8 | Chat & Trao đổi | 4 | Trung bình |
-| 9 | Thanh toán & Giao dịch | 5 | Cao |
-| 10 | Đánh giá & Phản hồi | 4 | Trung bình |
-| 11 | **Tính năng AI** | 4 | Cao |
-| 12 | Quản trị (Admin) | 5 | Trung bình |
+| STT | Nhóm tính năng | Số tính năng con | Độ ưu tiên | Phụ trách |
+|-----|----------------|------------------|------------|-----------|
+| 1 | Xác thực & Bảo mật | 6 | Cao | TV1 |
+| 2 | Quản lý hồ sơ người dùng | 5 | Cao | TV1 |
+| 3 | Duyệt & Tìm kiếm sản phẩm | 6 | Cao | TV2 |
+| 4 | Chi tiết sản phẩm | 5 | Cao | TV2 |
+| 5 | Đấu giá (Bidding) | 6 | Cao | TV3 |
+| 6 | Quản lý sản phẩm (Seller) | 5 | Cao | TV3 |
+| 7 | Hệ thống thông báo | 4 | Cao | TV4 |
+| 8 | Chat & Trao đổi | 4 | Cao | TV4 |
+| 9 | Thanh toán & Giao dịch | 5 | Cao | TV5 |
+| 10 | Đánh giá & Phản hồi | 4 | Trung bình | TV5 |
+| 11 | **Tính năng AI** | 4 | Cao | TV1 |
+| 12 | Quản trị (Admin) | 5 | Trung bình | TV2 |
+| 13 | Ví điện tử & Nạp tiền | 5 | Cao | TV3 |
+| 14 | Quản lý địa chỉ giao hàng | 4 | Trung bình | TV4 |
+| 15 | Báo cáo & Thống kê (User) | 4 | Trung bình | TV5 |
+| 16 | Hệ thống khuyến mãi & Voucher | 5 | Trung bình | TV1 |
+| 17 | Báo cáo vi phạm & Hỗ trợ | 4 | Trung bình | TV2 |
+| 18 | Đa ngôn ngữ & Accessibility | 4 | Trung bình | TV3 |
+| 19 | Offline Mode & Đồng bộ | 4 | Trung bình | TV4 |
+| 20 | Widget & Quick Actions | 4 | Thấp | TV5 |
+
+**Tổng cộng: 92 tính năng con**
 
 ---
 
@@ -1425,6 +1435,758 @@ implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
 ---
 
+### 💰 NHÓM 13: VÍ ĐIỆN TỬ & NẠP TIỀN
+
+#### 13.1 Xem số dư ví
+**Mô tả:** Hiển thị số dư hiện tại trong ví
+
+**UI Components (XML):**
+- `fragment_wallet.xml`
+- `CardView`: Hiển thị số dư lớn
+- `RecyclerView`: Lịch sử giao dịch gần đây
+- `Button`: Nạp tiền, Rút tiền
+
+**Layout Structure:**
+```xml
+<LinearLayout orientation="vertical">
+    <CardView>
+        <LinearLayout>
+            <TextView android:text="Số dư ví"/>
+            <TextView android:id="@+id/tvBalance" android:textSize="32sp"/>
+            <TextView android:text="VNĐ"/>
+        </LinearLayout>
+    </CardView>
+    
+    <LinearLayout orientation="horizontal">
+        <Button android:id="@+id/btnDeposit" android:text="Nạp tiền"/>
+        <Button android:id="@+id/btnWithdraw" android:text="Rút tiền"/>
+    </LinearLayout>
+    
+    <TextView android:text="Giao dịch gần đây"/>
+    <RecyclerView android:id="@+id/rvTransactions"/>
+</LinearLayout>
+```
+
+**API Endpoint:** `GET /api/wallet/balance`
+
+---
+
+#### 13.2 Nạp tiền vào ví
+**Mô tả:** Nạp tiền qua nhiều phương thức
+
+**UI Components (XML):**
+- `activity_deposit.xml`
+- `EditText`: Số tiền muốn nạp
+- `ChipGroup`: Số tiền gợi ý (100k, 200k, 500k, 1M)
+- `RadioGroup`: Phương thức thanh toán
+
+**Phương thức thanh toán:**
+- Chuyển khoản ngân hàng
+- Momo
+- ZaloPay
+- VNPay
+- Thẻ tín dụng/ghi nợ
+
+**Dependencies:**
+```gradle
+implementation 'com.momo.sdk:payment:1.0.0'
+implementation 'vn.zalopay.sdk:payment:1.0.0'
+```
+
+**API Endpoint:** `POST /api/wallet/deposit`
+
+---
+
+#### 13.3 Rút tiền từ ví
+**Mô tả:** Rút tiền về tài khoản ngân hàng
+
+**UI Components (XML):**
+- `activity_withdraw.xml`
+- `EditText`: Số tiền rút
+- `Spinner`: Chọn ngân hàng
+- `EditText`: Số tài khoản, Tên chủ tài khoản
+- `Button`: Xác nhận rút tiền
+
+**Validation:**
+- Số tiền rút <= Số dư
+- Tối thiểu 50,000 VNĐ
+- Xác nhận OTP trước khi rút
+
+**API Endpoint:** `POST /api/wallet/withdraw`
+
+---
+
+#### 13.4 Lịch sử giao dịch ví
+**Mô tả:** Xem tất cả giao dịch ví
+
+**UI Components (XML):**
+- `activity_transaction_history.xml`
+- `TabLayout`: Tất cả / Nạp tiền / Rút tiền / Thanh toán
+- `RecyclerView` + `item_transaction.xml`
+- Filter theo thời gian
+
+**Transaction Types:**
+```java
+public enum TransactionType {
+    DEPOSIT,        // Nạp tiền
+    WITHDRAW,       // Rút tiền
+    PAYMENT,        // Thanh toán đấu giá
+    REFUND,         // Hoàn tiền
+    RECEIVE         // Nhận tiền từ người mua
+}
+```
+
+**API Endpoint:** `GET /api/wallet/transactions`
+
+---
+
+#### 13.5 Thanh toán đấu giá qua ví
+**Mô tả:** Sử dụng số dư ví để thanh toán
+
+**UI Components (XML):**
+- `dialog_wallet_payment.xml`
+- Hiển thị số dư, số tiền cần thanh toán
+- `Button`: Xác nhận thanh toán
+
+**Flow:**
+1. Thắng đấu giá → Chọn thanh toán qua ví
+2. Kiểm tra số dư đủ
+3. Trừ tiền từ ví → Chuyển cho seller
+4. Cập nhật trạng thái đơn hàng
+
+**API Endpoint:** `POST /api/wallet/pay/{orderId}`
+
+---
+
+### 📍 NHÓM 14: QUẢN LÝ ĐỊA CHỈ GIAO HÀNG
+
+#### 14.1 Danh sách địa chỉ
+**Mô tả:** Quản lý nhiều địa chỉ giao hàng
+
+**UI Components (XML):**
+- `fragment_addresses.xml`
+- `RecyclerView` + `item_address.xml`
+- `FloatingActionButton`: Thêm địa chỉ mới
+- Badge "Mặc định" cho địa chỉ chính
+
+**Item Address Layout:**
+```xml
+<CardView>
+    <LinearLayout>
+        <TextView android:id="@+id/tvRecipientName"/>
+        <TextView android:id="@+id/tvPhone"/>
+        <TextView android:id="@+id/tvAddress"/>
+        <Chip android:id="@+id/chipDefault" android:text="Mặc định"/>
+        <ImageButton android:id="@+id/btnEdit"/>
+        <ImageButton android:id="@+id/btnDelete"/>
+    </LinearLayout>
+</CardView>
+```
+
+**API Endpoint:** `GET /api/addresses`
+
+---
+
+#### 14.2 Thêm/Sửa địa chỉ
+**Mô tả:** Form nhập địa chỉ chi tiết
+
+**UI Components (XML):**
+- `activity_edit_address.xml`
+- `EditText`: Tên người nhận, Số điện thoại
+- `Spinner`: Tỉnh/Thành phố, Quận/Huyện, Phường/Xã
+- `EditText`: Địa chỉ chi tiết
+- `SwitchCompat`: Đặt làm mặc định
+
+**Address API:**
+- Tích hợp API địa chỉ Việt Nam (provinces.open-api.vn)
+
+**API Endpoints:**
+- `POST /api/addresses`
+- `PUT /api/addresses/{id}`
+
+---
+
+#### 14.3 Chọn địa chỉ khi thanh toán
+**Mô tả:** Bottom sheet chọn địa chỉ giao hàng
+
+**UI Components (XML):**
+- `BottomSheetDialogFragment`
+- `RecyclerView`: Danh sách địa chỉ
+- `Button`: Thêm địa chỉ mới
+
+---
+
+#### 14.4 Xác định vị trí GPS
+**Mô tả:** Tự động điền địa chỉ từ GPS
+
+**Implementation:**
+- `FusedLocationProviderClient`
+- Geocoder để chuyển tọa độ → địa chỉ
+
+**Permissions:**
+```xml
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+```
+
+---
+
+### 📊 NHÓM 15: BÁO CÁO & THỐNG KÊ (USER)
+
+#### 15.1 Thống kê đấu giá cá nhân
+**Mô tả:** Dashboard thống kê hoạt động đấu giá
+
+**UI Components (XML):**
+- `fragment_my_statistics.xml`
+- Cards: Tổng đấu giá, Tỷ lệ thắng, Tổng chi tiêu
+- `PieChart`: Phân bổ danh mục đấu giá
+- `LineChart`: Hoạt động theo thời gian
+
+**Statistics Model:**
+```java
+public class UserStatistics {
+    private int totalBids;
+    private int wonAuctions;
+    private int lostAuctions;
+    private double winRate;
+    private double totalSpent;
+    private double totalEarned; // Nếu là seller
+    private Map<String, Integer> categoryDistribution;
+}
+```
+
+**API Endpoint:** `GET /api/users/statistics`
+
+---
+
+#### 15.2 Thống kê bán hàng (Seller)
+**Mô tả:** Dashboard cho seller
+
+**UI Components (XML):**
+- `fragment_seller_statistics.xml`
+- Cards: Tổng sản phẩm đăng, Đã bán, Doanh thu
+- `BarChart`: Doanh thu theo tháng
+- `RecyclerView`: Sản phẩm bán chạy nhất
+
+**API Endpoint:** `GET /api/sellers/statistics`
+
+---
+
+#### 15.3 Xuất báo cáo
+**Mô tả:** Export báo cáo ra PDF/Excel
+
+**Features:**
+- Xuất lịch sử giao dịch
+- Xuất báo cáo thuế (cho seller)
+- Gửi qua email
+
+**Dependencies:**
+```gradle
+implementation 'com.itextpdf:itext7-core:7.2.5'
+implementation 'org.apache.poi:poi-ooxml:5.2.3'
+```
+
+---
+
+#### 15.4 So sánh giá sản phẩm
+**Mô tả:** Biểu đồ so sánh giá theo thời gian
+
+**UI Components (XML):**
+- `activity_price_comparison.xml`
+- `LineChart`: Giá trung bình theo danh mục
+- `DateRangePicker`: Chọn khoảng thời gian
+
+---
+
+### 🎁 NHÓM 16: HỆ THỐNG KHUYẾN MÃI & VOUCHER
+
+#### 16.1 Danh sách voucher của tôi
+**Mô tả:** Xem voucher đang có
+
+**UI Components (XML):**
+- `fragment_my_vouchers.xml`
+- `TabLayout`: Còn hạn / Đã sử dụng / Hết hạn
+- `RecyclerView` + `item_voucher.xml`
+
+**Voucher Item Layout:**
+```xml
+<CardView android:background="@drawable/voucher_background">
+    <LinearLayout>
+        <TextView android:id="@+id/tvDiscount"/> <!-- -10% hoặc -50K -->
+        <TextView android:id="@+id/tvVoucherName"/>
+        <TextView android:id="@+id/tvCondition"/> <!-- Đơn tối thiểu 500K -->
+        <TextView android:id="@+id/tvExpiry"/>
+        <Button android:text="Sử dụng"/>
+    </LinearLayout>
+</CardView>
+```
+
+**API Endpoint:** `GET /api/vouchers/my`
+
+---
+
+#### 16.2 Nhập mã voucher
+**Mô tả:** Nhập mã để nhận voucher
+
+**UI Components (XML):**
+- `dialog_enter_voucher.xml`
+- `EditText`: Mã voucher
+- `Button`: Áp dụng
+
+**API Endpoint:** `POST /api/vouchers/redeem`
+
+---
+
+#### 16.3 Áp dụng voucher khi thanh toán
+**Mô tả:** Chọn voucher khi checkout
+
+**UI Components (XML):**
+- `BottomSheetDialogFragment`
+- Danh sách voucher áp dụng được
+- Tự động tính giảm giá
+
+**Voucher Types:**
+```java
+public enum VoucherType {
+    PERCENTAGE,     // Giảm theo %
+    FIXED_AMOUNT,   // Giảm số tiền cố định
+    FREE_SHIPPING   // Miễn phí vận chuyển
+}
+```
+
+---
+
+#### 16.4 Chương trình điểm thưởng
+**Mô tả:** Tích điểm khi giao dịch
+
+**UI Components (XML):**
+- `fragment_reward_points.xml`
+- `TextView`: Tổng điểm
+- `RecyclerView`: Lịch sử tích điểm
+- `RecyclerView`: Đổi điểm lấy voucher
+
+**Point Rules:**
+- Mua hàng: 1% giá trị = điểm
+- Bán hàng: 0.5% giá trị = điểm
+- 100 điểm = 1,000 VNĐ voucher
+
+**API Endpoints:**
+- `GET /api/rewards/points`
+- `POST /api/rewards/exchange`
+
+---
+
+#### 16.5 Flash Sale & Ưu đãi đặc biệt
+**Mô tả:** Hiển thị các chương trình khuyến mãi
+
+**UI Components (XML):**
+- `fragment_promotions.xml`
+- `ViewPager2`: Banner khuyến mãi
+- `RecyclerView`: Sản phẩm Flash Sale
+- Countdown timer
+
+---
+
+### 🚨 NHÓM 17: BÁO CÁO VI PHẠM & HỖ TRỢ
+
+#### 17.1 Báo cáo sản phẩm vi phạm
+**Mô tả:** Report sản phẩm có vấn đề
+
+**UI Components (XML):**
+- `dialog_report_product.xml`
+- `RadioGroup`: Lý do báo cáo
+  - Sản phẩm giả/nhái
+  - Mô tả sai sự thật
+  - Hình ảnh không phù hợp
+  - Giá bất thường
+  - Khác
+- `EditText`: Mô tả chi tiết
+- `Button`: Gửi báo cáo
+
+**API Endpoint:** `POST /api/reports/product/{productId}`
+
+---
+
+#### 17.2 Báo cáo người dùng
+**Mô tả:** Report user vi phạm
+
+**UI Components (XML):**
+- `dialog_report_user.xml`
+- `RadioGroup`: Lý do
+  - Gian lận
+  - Ngôn từ không phù hợp
+  - Spam
+  - Không giao hàng
+  - Khác
+- `EditText`: Mô tả
+
+**API Endpoint:** `POST /api/reports/user/{userId}`
+
+---
+
+#### 17.3 Trung tâm hỗ trợ
+**Mô tả:** FAQ và liên hệ hỗ trợ
+
+**UI Components (XML):**
+- `fragment_help_center.xml`
+- `SearchView`: Tìm kiếm FAQ
+- `ExpandableListView`: Danh mục FAQ
+- `Button`: Chat với hỗ trợ viên
+- `Button`: Gọi hotline
+
+**FAQ Categories:**
+- Hướng dẫn đấu giá
+- Thanh toán & Hoàn tiền
+- Vận chuyển
+- Tài khoản
+- Khiếu nại
+
+---
+
+#### 17.4 Gửi ticket hỗ trợ
+**Mô tả:** Tạo yêu cầu hỗ trợ
+
+**UI Components (XML):**
+- `activity_create_ticket.xml`
+- `Spinner`: Loại vấn đề
+- `EditText`: Tiêu đề, Mô tả chi tiết
+- `RecyclerView`: Đính kèm ảnh
+- `Button`: Gửi
+
+**Ticket Tracking:**
+- Xem trạng thái ticket
+- Nhận thông báo khi có phản hồi
+
+**API Endpoints:**
+- `POST /api/support/tickets`
+- `GET /api/support/tickets`
+- `GET /api/support/tickets/{id}`
+
+---
+
+### 🌐 NHÓM 18: ĐA NGÔN NGỮ & ACCESSIBILITY
+
+#### 18.1 Chuyển đổi ngôn ngữ
+**Mô tả:** Hỗ trợ nhiều ngôn ngữ
+
+**UI Components (XML):**
+- `fragment_language_settings.xml`
+- `RecyclerView` + `item_language.xml`
+- Radio button chọn ngôn ngữ
+
+**Supported Languages:**
+- 🇻🇳 Tiếng Việt (mặc định)
+- 🇺🇸 English
+- 🇯🇵 日本語 (Japanese)
+- 🇨🇳 中文 (Chinese)
+
+**Implementation:**
+```java
+public class LocaleHelper {
+    public static void setLocale(Context context, String language) {
+        Locale locale = new Locale(language);
+        Locale.setDefault(locale);
+        Configuration config = context.getResources().getConfiguration();
+        config.setLocale(locale);
+        context.createConfigurationContext(config);
+    }
+}
+```
+
+**Resources:**
+```
+res/
+├── values/strings.xml          (Vietnamese - default)
+├── values-en/strings.xml       (English)
+├── values-ja/strings.xml       (Japanese)
+└── values-zh/strings.xml       (Chinese)
+```
+
+---
+
+#### 18.2 Dark Mode
+**Mô tả:** Chế độ tối cho app
+
+**UI Components (XML):**
+- `SwitchCompat` trong Settings
+- Options: Light / Dark / System default
+
+**Implementation:**
+```java
+public class ThemeManager {
+    public static void setTheme(int mode) {
+        AppCompatDelegate.setDefaultNightMode(mode);
+        // MODE_NIGHT_NO, MODE_NIGHT_YES, MODE_NIGHT_FOLLOW_SYSTEM
+    }
+}
+```
+
+**Resources:**
+```
+res/
+├── values/colors.xml
+├── values/themes.xml
+├── values-night/colors.xml
+└── values-night/themes.xml
+```
+
+---
+
+#### 18.3 Điều chỉnh cỡ chữ
+**Mô tả:** Thay đổi kích thước font
+
+**UI Components (XML):**
+- `SeekBar`: Điều chỉnh từ 80% - 150%
+- Preview text
+
+**Implementation:**
+```java
+public class FontScaleManager {
+    public static void setFontScale(Activity activity, float scale) {
+        Configuration config = activity.getResources().getConfiguration();
+        config.fontScale = scale;
+        activity.getResources().updateConfiguration(config, 
+            activity.getResources().getDisplayMetrics());
+        activity.recreate();
+    }
+}
+```
+
+---
+
+#### 18.4 Hỗ trợ TalkBack
+**Mô tả:** Accessibility cho người khiếm thị
+
+**Implementation:**
+- `contentDescription` cho tất cả ImageView
+- `labelFor` cho EditText
+- Focus navigation hợp lý
+- Announce changes với `announceForAccessibility()`
+
+**Best Practices:**
+```xml
+<ImageButton
+    android:contentDescription="@string/btn_place_bid_desc"
+    android:importantForAccessibility="yes"/>
+
+<EditText
+    android:hint="@string/hint_bid_amount"
+    android:labelFor="@+id/tvBidLabel"/>
+```
+
+---
+
+### 📴 NHÓM 19: OFFLINE MODE & ĐỒNG BỘ
+
+#### 19.1 Cache dữ liệu offline
+**Mô tả:** Xem sản phẩm khi không có mạng
+
+**Implementation:**
+- Room Database lưu cache
+- NetworkBoundResource pattern
+- Hiển thị dữ liệu cũ với indicator "Offline"
+
+**Cached Data:**
+- Danh mục sản phẩm
+- Sản phẩm đã xem
+- Watchlist
+- Thông tin profile
+
+**Strategy:**
+```java
+public abstract class NetworkBoundResource<ResultType, RequestType> {
+    // 1. Hiển thị data từ DB
+    // 2. Fetch từ network
+    // 3. Lưu vào DB
+    // 4. Hiển thị data mới
+}
+```
+
+---
+
+#### 19.2 Queue hành động offline
+**Mô tả:** Lưu hành động chờ sync
+
+**Features:**
+- Thêm vào watchlist khi offline → sync khi online
+- Xóa thông báo khi offline → sync khi online
+
+**Implementation:**
+```java
+@Entity(tableName = "pending_actions")
+public class PendingAction {
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+    private String actionType; // ADD_WATCHLIST, REMOVE_WATCHLIST
+    private String payload; // JSON data
+    private long createdAt;
+}
+```
+
+**WorkManager:**
+```java
+public class SyncWorker extends Worker {
+    @Override
+    public Result doWork() {
+        // Process pending actions
+        // Sync with server
+        return Result.success();
+    }
+}
+```
+
+---
+
+#### 19.3 Kiểm tra kết nối mạng
+**Mô tả:** Theo dõi trạng thái mạng
+
+**UI Components (XML):**
+- Banner/Snackbar thông báo mất kết nối
+- Auto-hide khi có mạng lại
+
+**Implementation:**
+```java
+public class NetworkMonitor {
+    private ConnectivityManager.NetworkCallback networkCallback;
+    
+    public LiveData<Boolean> isConnected() {
+        // Monitor network state
+    }
+}
+```
+
+---
+
+#### 19.4 Đồng bộ khi có mạng
+**Mô tả:** Tự động sync dữ liệu
+
+**Features:**
+- Sync watchlist
+- Sync notifications read status
+- Sync pending bids (nếu còn hạn)
+- Pull latest data
+
+**WorkManager Constraints:**
+```java
+Constraints constraints = new Constraints.Builder()
+    .setRequiredNetworkType(NetworkType.CONNECTED)
+    .build();
+
+OneTimeWorkRequest syncWork = new OneTimeWorkRequest.Builder(SyncWorker.class)
+    .setConstraints(constraints)
+    .build();
+```
+
+---
+
+### 📲 NHÓM 20: WIDGET & QUICK ACTIONS
+
+#### 20.1 Home Screen Widget
+**Mô tả:** Widget hiển thị sản phẩm đang theo dõi
+
+**Widget Types:**
+- **Small (2x1):** Countdown sản phẩm sắp kết thúc
+- **Medium (4x2):** Danh sách 3 sản phẩm watchlist
+- **Large (4x4):** Sản phẩm + giá + countdown
+
+**Implementation:**
+```xml
+<!-- res/xml/watchlist_widget_info.xml -->
+<appwidget-provider
+    android:minWidth="180dp"
+    android:minHeight="110dp"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/widget_watchlist"
+    android:resizeMode="horizontal|vertical"/>
+```
+
+**Widget Provider:**
+```java
+public class WatchlistWidgetProvider extends AppWidgetProvider {
+    @Override
+    public void onUpdate(Context context, AppWidgetManager manager, int[] ids) {
+        // Update widget content
+    }
+}
+```
+
+---
+
+#### 20.2 App Shortcuts
+**Mô tả:** Quick actions từ app icon
+
+**Static Shortcuts (res/xml/shortcuts.xml):**
+```xml
+<shortcuts>
+    <shortcut android:shortcutId="search"
+        android:icon="@drawable/ic_search"
+        android:shortcutShortLabel="@string/shortcut_search">
+        <intent android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.auctionhub"
+            android:targetClass=".ui.search.SearchActivity"/>
+    </shortcut>
+    
+    <shortcut android:shortcutId="watchlist"
+        android:icon="@drawable/ic_favorite"
+        android:shortcutShortLabel="@string/shortcut_watchlist">
+        <!-- Intent -->
+    </shortcut>
+    
+    <shortcut android:shortcutId="sell"
+        android:icon="@drawable/ic_add"
+        android:shortcutShortLabel="@string/shortcut_sell">
+        <!-- Intent -->
+    </shortcut>
+</shortcuts>
+```
+
+**Dynamic Shortcuts:**
+- Sản phẩm đã xem gần đây
+- Sản phẩm đang đấu giá
+
+---
+
+#### 20.3 Quick Tile (Quick Settings)
+**Mô tả:** Tile trong Quick Settings panel
+
+**Implementation:**
+```java
+public class AuctionTileService extends TileService {
+    @Override
+    public void onClick() {
+        // Open watchlist with ending soon products
+    }
+    
+    @Override
+    public void onStartListening() {
+        // Update tile state
+        Tile tile = getQsTile();
+        tile.setLabel("3 sắp kết thúc");
+        tile.updateTile();
+    }
+}
+```
+
+---
+
+#### 20.4 Notification Actions
+**Mô tả:** Quick actions trong notification
+
+**Outbid Notification:**
+```java
+NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+    .setContentTitle("Bạn đã bị vượt giá!")
+    .setContentText("iPhone 15 - Giá mới: 15,000,000đ")
+    .addAction(R.drawable.ic_bid, "Đặt giá cao hơn", bidPendingIntent)
+    .addAction(R.drawable.ic_view, "Xem chi tiết", detailPendingIntent);
+```
+
+**Auction Ending Notification:**
+- Button: "Đặt giá ngay"
+- Button: "Bỏ qua"
+
+---
+
 ## 🏗️ KIẾN TRÚC KỸ THUẬT
 
 ### Architecture Pattern: MVVM
@@ -1772,12 +2534,65 @@ test: Add unit tests for BidValidator
 
 ## ✅ CHECKLIST HOÀN THÀNH
 
-- [ ] 12 nhóm tính năng (3 thành viên × 4)
+- [ ] 20 nhóm tính năng (5 thành viên × 4)
 - [ ] Tính năng AI (Nhóm 11)
 - [ ] Git repository với 30+ commits
 - [ ] Commits phân bố trong 15+ ngày
 - [ ] Documentation đầy đủ
 - [ ] Demo video/presentation
+
+---
+
+## 👥 PHÂN CÔNG THÀNH VIÊN (Gợi ý)
+
+### Thành viên 1 (TV1)
+| Nhóm | Tên | Số tính năng |
+|------|-----|--------------|
+| 1 | Xác thực & Bảo mật | 6 |
+| 11 | Tính năng AI | 4 |
+| 16 | Hệ thống khuyến mãi & Voucher | 5 |
+| **Tổng** | | **15** |
+
+### Thành viên 2 (TV2)
+| Nhóm | Tên | Số tính năng |
+|------|-----|--------------|
+| 3 | Duyệt & Tìm kiếm sản phẩm | 6 |
+| 12 | Quản trị (Admin) | 5 |
+| 17 | Báo cáo vi phạm & Hỗ trợ | 4 |
+| **Tổng** | | **15** |
+
+### Thành viên 3 (TV3)
+| Nhóm | Tên | Số tính năng |
+|------|-----|--------------|
+| 5 | Đấu giá (Bidding) | 6 |
+| 13 | Ví điện tử & Nạp tiền | 5 |
+| 18 | Đa ngôn ngữ & Accessibility | 4 |
+| **Tổng** | | **15** |
+
+### Thành viên 4 (TV4)
+| Nhóm | Tên | Số tính năng |
+|------|-----|--------------|
+| 7 | Hệ thống thông báo | 4 |
+| 8 | Chat & Trao đổi | 4 |
+| 14 | Quản lý địa chỉ giao hàng | 4 |
+| 19 | Offline Mode & Đồng bộ | 4 |
+| **Tổng** | | **16** |
+
+### Thành viên 5 (TV5)
+| Nhóm | Tên | Số tính năng |
+|------|-----|--------------|
+| 9 | Thanh toán & Giao dịch | 5 |
+| 10 | Đánh giá & Phản hồi | 4 |
+| 15 | Báo cáo & Thống kê (User) | 4 |
+| 20 | Widget & Quick Actions | 4 |
+| **Tổng** | | **17** |
+
+### Công việc chung (Tất cả thành viên)
+| Nhóm | Tên | Phân công |
+|------|-----|-----------|
+| 2 | Quản lý hồ sơ người dùng | Chia đều |
+| 4 | Chi tiết sản phẩm | Chia đều |
+| 6 | Quản lý sản phẩm (Seller) | Chia đều |
 
 ---
 
